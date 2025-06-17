@@ -14,7 +14,7 @@ RUN apt-get update && apt-get install -y \
     libtiff5-dev \
     libjpeg-dev \
     libpq-dev && \
-    R -e "install.packages(c('shinydashboard', 'DBI', 'RPostgres', 'DT', 'ggplot2', 'dplyr'), repos='https://cloud.r-project.org')"
+    R -e "install.packages(c('shinydashboard', 'DBI', 'RPostgres', 'DT', 'plotly', 'tidyverse', 'viridis'), repos='https://cloud.r-project.org')"
 
 # Salin semua file ke dalam image
 COPY . /srv/shiny-server/app
