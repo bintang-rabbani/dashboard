@@ -1,4 +1,4 @@
-FROM rocker/verse:4.3.1
+FROM rocker/shiny:latest
 
 # Install sistem libs untuk RPostgres & plotly
 RUN apt-get update && apt-get install -y libpq-dev && rm -rf /var/lib/apt/lists/*
