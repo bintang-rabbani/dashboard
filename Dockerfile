@@ -11,7 +11,7 @@ RUN apt-get update && apt-get install -y \
 COPY . /srv/shiny-server/app
 
 # Set permission
-RUN chown -R shiny:shiny /srv/shiny-server/app
+RUN chown -R shiny:shiny /srv/shiny-server
 
 # Expose port shiny
 EXPOSE 3838
