@@ -59,8 +59,8 @@ ui <- dashboardPage(
       ),
       tabItem(tabName = "brand",
               fluidRow(
-                box(title = "Top 10 Brands by Units Sold", width = 6, plotlyOutput("plotTopBrandsquantity", height = 350)),
-                box(title = "Unique Product per Brand", width = 6, plotlyOutput("plotUniqueProdBrand", height = 350))
+                box(title = "Top 10 Brands by Units Sold", width = 12, plotlyOutput("plotTopBrandsquantity", height = 350)),
+                box(title = "Unique Product per Brand", width = 12, plotlyOutput("plotUniqueProdBrand", height = 350))
               )
       ),
       tabItem(tabName = "data",
