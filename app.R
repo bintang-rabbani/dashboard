@@ -29,11 +29,11 @@ db_connect <- function() {
 selected_theme <- "blue_gradient"
 
 # UI
-iu <- NULL  # remove if previously defined incorrectly
 ui <- dashboardPage(
   skin = "blue",
-  dashboardHeader(
-    title = span(style = "font-family: 'Roboto', sans-serif; font-weight: bold; color: #fff;", "Dashboard"),
+  title = "Dashboard",
+  header = dashboardHeader(
+    title = span(style = "font-family: 'Roboto', sans-serif; font-weight: bold; color: #fff;", "Go Sales"),
     titleWidth = 280
   ),
   dashboardSidebar(
@@ -96,6 +96,7 @@ ui <- dashboardPage(
   dashboardBody(
     fluidPage(
       tags$head(
+        tags$link(rel = "shortcut icon", href = "favicon.ico", type = "image/x-icon"),
         tags$link(rel = "stylesheet", href = "https://fonts.googleapis.com/css?family=Roboto:400,700&display=swap")
       ),
       tabItems(
