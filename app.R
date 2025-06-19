@@ -1,3 +1,4 @@
+# Load libraries
 library(shiny)
 library(shinydashboard)
 library(DBI)
@@ -6,11 +7,12 @@ library(tidyverse)
 library(plotly)
 library(DT)
 library(viridis)
+library(dashboardthemes)
 
-# Mematikan scientific notation
+# Disable scientific notation
 options(scipen = 999)
 
-# Fungsi koneksi database
+# DB connect function
 db_connect <- function() {
   dbConnect(
     Postgres(),
@@ -22,65 +24,126 @@ db_connect <- function() {
   )
 }
 
+# Dashboardthemes:
+# "grey_dark", "grey_light", "blue_gradient", "purple_gradient", "flat_red", dll.
+selected_theme <- "blue_gradient"
+
 # UI
+iu <- NULL  # remove if previously defined incorrectly
 ui <- dashboardPage(
-  dashboardHeader(title = "Products Dashboard", titleWidth = 280),
-  dashboardSidebar(width = 280,
-                   sidebarMenu(
-                     menuItem("Data", tabName = "data", icon = icon("table")),
-                     menuItem("Summary", tabName = "summary", icon = icon("chart-pie")),
-                     menuItem("Category", tabName = "category", icon = icon("th-list")),
-                     menuItem("Product Type", tabName = "type", icon = icon("box-open")),
-                     menuItem("Brand", tabName = "brand", icon = icon("tags"))
-                   ),
-                   hr(),
-                   selectInput("catSelect", "Select category:", choices = NULL),
-                   selectInput("typeSelect", "Select type:", choices = NULL),
-                   selectInput("brandSelect", "Select brand:", choices = NULL)
+  skin = "blue",
+  dashboardHeader(
+    title = span(style = "font-family: 'Roboto', sans-serif; font-weight: bold; color: #fff;", "Dashboard"),
+    titleWidth = 280
+  ),
+  dashboardSidebar(
+    width = 280,
+    tags$head(
+      tags$style(HTML(
+        "
+        /* Responsive: sembunyikan selectInput/form-group saat sidebar collapse */
+        body.sidebar-collapse .main-sidebar .form-group { display: none !important; }
+        /* Pastikan selectize full width saat sidebar expand */
+        .main-sidebar .form-group .selectize-control { width: 100% !important; }
+        /* Styling sidebar & header untuk skin blue dengan gradient */
+        .skin-blue .main-sidebar {
+          background: linear-gradient(180deg, #4e79a7, #1f3b73);
+        }
+        .skin-blue .sidebar a {
+          color: #fff;
+        }
+        .skin-blue .sidebar a:hover {
+          color: #e0e7ff;
+        }
+        .skin-blue .main-header .navbar, .skin-blue .main-header .logo {
+          background: linear-gradient(180deg, #1f3b73, #16325c);
+        }
+        .box, .small-box {
+          border-radius: 8px;
+          box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        .dataTables_wrapper .dataTables_filter input {
+          border-radius: 4px;
+          border: 1px solid #ccc;
+        }
+        "
+      )),
+      tags$script(HTML(
+        "
+        // JS: kirim status collapse ke Shiny jika mau custom logic di server
+        $(document).on('click', '.sidebar-toggle', function() {
+          var collapsed = $('body').hasClass('sidebar-collapse');
+          Shiny.setInputValue('sidebar_collapsed', collapsed, {priority: 'event'});
+        });
+        "
+      ))
+    ),
+    shinyDashboardThemes(
+      theme = selected_theme
+    ),
+    sidebarMenu(
+      menuItem("Data", tabName = "data", icon = icon("table")),
+      menuItem("Summary", tabName = "summary", icon = icon("chart-pie")),
+      menuItem("Category", tabName = "category", icon = icon("th-list")),
+      menuItem("Product Type", tabName = "type", icon = icon("box-open")),
+      menuItem("Brand", tabName = "brand", icon = icon("tags"))
+    ),
+    hr(style = "border-color: #b3cde0;"),
+    selectInput("catSelect", "Select category:", choices = NULL),
+    selectInput("typeSelect", "Select type:", choices = NULL),
+    selectInput("brandSelect", "Select brand:", choices = NULL)
   ),
   dashboardBody(
-    tabItems(
-      tabItem(tabName = "summary",
-              fluidRow(valueBoxOutput("boxRevenue"), valueBoxOutput("boxQuantity"), valueBoxOutput("boxMarkup")),
-              fluidRow(
-                box(title = "Average Price per Category", width = 12, plotlyOutput("plotAvgPriceCat", height = 300)),
-                box(title = "Quantity Sold per Category", width = 12, plotlyOutput("plotCategoryquantity", height = 300))
-              )
+    fluidPage(
+      tags$head(
+        tags$link(rel = "stylesheet", href = "https://fonts.googleapis.com/css?family=Roboto:400,700&display=swap")
       ),
-      tabItem(tabName = "category",
-              fluidRow(
-                box(title = "Product per Category", width = 12, plotlyOutput("plotProductsPerCat", height = 400))
-              )
-      ),
-      tabItem(tabName = "type",
-              fluidRow(
-                box(title = "Revenue by Product Type", width = 12, plotlyOutput("plotTypeDetail", height = 400))
-              )
-      ),
-      tabItem(tabName = "brand",
-              fluidRow(
-                box(title = "Top 10 Brands by Units Sold", width = 12, plotlyOutput("plotTopBrandsquantity", height = 350)),
-                box(title = "Unique Product per Brand", width = 12, plotlyOutput("plotUniqueProdBrand", height = 350))
-              )
-      ),
-      tabItem(tabName = "data",
-              fluidRow(
-                box(title = "Dataset", width = 12, DTOutput("tableData"))
-              )
+      tabItems(
+        tabItem(tabName = "summary",
+                fluidRow(
+                  valueBoxOutput("boxRevenue", width = 4),
+                  valueBoxOutput("boxQuantity", width = 4),
+                  valueBoxOutput("boxMarkup", width = 4)
+                ),
+                fluidRow(
+                  box(title = "Average Price per Category", width = 12, solidHeader = TRUE, status = "primary", plotlyOutput("plotAvgPriceCat", height = 300)),
+                  box(title = "Quantity Sold per Category", width = 12, solidHeader = TRUE, status = "success", plotlyOutput("plotCategoryquantity", height = 300))
+                )
+        ),
+        tabItem(tabName = "category",
+                fluidRow(
+                  box(title = "Product per Category", width = 12, solidHeader = TRUE, status = "warning", plotlyOutput("plotProductsPerCat", height = 400))
+                )
+        ),
+        tabItem(tabName = "type",
+                fluidRow(
+                  box(title = "Revenue by Product Type", width = 12, solidHeader = TRUE, status = "success", plotlyOutput("plotTypeDetail", height = 400))
+                )
+        ),
+        tabItem(tabName = "brand",
+                fluidRow(
+                  box(title = "Top 10 Brands by Units Sold", width = 12, solidHeader = TRUE, status = "danger", plotlyOutput("plotTopBrandsquantity", height = 350)),
+                  box(title = "Unique Products per Brand", width = 12, solidHeader = TRUE, status = "primary", plotlyOutput("plotUniqueProdBrand", height = 350))
+                )
+        ),
+        tabItem(tabName = "data",
+                fluidRow(
+                  box(title = "Products Dataset", width = 12, solidHeader = TRUE, status = "info", DTOutput("tableData"))
+                )
+        )
       )
     )
   )
 )
 
+# Server
 server <- function(input, output, session) {
-  # Data from DB
   data_all <- reactive({
     con <- db_connect()
     on.exit(dbDisconnect(con), add = TRUE)
     dbGetQuery(con, "SELECT * FROM products")
   })
   
-  # Update filter choices based on DB data
   observe({
     df <- data_all()
     updateSelectInput(session, "catSelect", choices = c("All", unique(df$product_category)), selected = "All")
@@ -88,84 +151,77 @@ server <- function(input, output, session) {
     updateSelectInput(session, "brandSelect", choices = c("All", unique(df$product_brand)), selected = "All")
   })
   
-  # Reactive filtered data
   filtered <- reactive({
     df <- data_all()
-    if (input$catSelect != "All") df <- filter(df, product_category == input$catSelect)
-    if (input$typeSelect != "All") df <- filter(df, product_type == input$typeSelect)
-    if (input$brandSelect != "All") df <- filter(df, product_brand == input$brandSelect)
+    if (!is.null(input$catSelect) && input$catSelect != "All") df <- filter(df, product_category == input$catSelect)
+    if (!is.null(input$typeSelect) && input$typeSelect != "All") df <- filter(df, product_type == input$typeSelect)
+    if (!is.null(input$brandSelect) && input$brandSelect != "All") df <- filter(df, product_brand == input$brandSelect)
     df
   })
   
-  # Value Boxes
   output$boxRevenue <- renderValueBox({
     rev <- sum(filtered()$revenue, na.rm = TRUE)
-    valueBox(scales::dollar(rev), "Total Revenue", icon = icon("money-bill"), color = "green")
+    valueBox(scales::dollar(rev), "Total Revenue", icon = icon("shopping-cart"), color = "light-blue")
   })
   output$boxQuantity <- renderValueBox({
     quantity <- sum(filtered()$quantity, na.rm = TRUE)
-    valueBox(quantity, "Total Quantity", icon = icon("shopping-cart"), color = "blue")
+    valueBox(quantity, "Total Quantity", icon = icon("boxes"), color = "yellow")
   })
   output$boxMarkup <- renderValueBox({
     mpu <- mean(filtered()$markup, na.rm = TRUE)
-    valueBox(round(mpu, 2), "Average Markup", icon = icon("line-chart"), color = "yellow")
+    valueBox(round(mpu, 2), "Average Markup", icon = icon("line-chart"), color = "maroon")
   })
   
-  # Base theme tanpa axis titles
   base_theme <- theme_minimal() + theme(axis.title = element_blank())
   
-  # Summary Plots
   output$plotAvgPriceCat <- renderPlotly({
-    dat <- filtered() %>% group_by(product_category) %>%
-      summarize(average_price = sum(revenue)/sum(quantity))
+    dat <- filtered() %>% group_by(product_category) %>% summarize(average_price = sum(revenue, na.rm=TRUE)/sum(quantity, na.rm=TRUE))
     p <- ggplot(dat, aes(reorder(product_category, average_price), average_price,
                          text = paste0(product_category, ': $', round(average_price, 2)))) +
-      geom_col(aes(fill = average_price)) + scale_fill_viridis() + coord_flip() + base_theme
-    ggplotly(p, tooltip = "text")
-  })
-  output$plotCategoryquantity <- renderPlotly({
-    dat <- filtered() %>% group_by(product_category) %>% summarize(quantity = sum(quantity))
-    p <- ggplot(dat, aes(reorder(product_category, quantity), quantity,
-                         text = paste0(product_category, ': ', quantity, ' units'))) +
-      geom_col(aes(fill = quantity)) + scale_fill_viridis() + coord_flip() + base_theme
+      geom_col(aes(fill = average_price)) + scale_fill_viridis(option = "magma") + coord_flip() + base_theme
     ggplotly(p, tooltip = "text")
   })
   
-  # Category Detail
+  output$plotCategoryquantity <- renderPlotly({
+    dat <- filtered() %>% group_by(product_category) %>% summarize(quantity = sum(quantity, na.rm=TRUE))
+    p <- ggplot(dat, aes(reorder(product_category, quantity), quantity,
+                         text = paste0(product_category, ': ', quantity, ' units'))) +
+      geom_col(aes(fill = quantity)) + scale_fill_viridis(option = "plasma") + coord_flip() + base_theme
+    ggplotly(p, tooltip = "text")
+  })
+  
   output$plotProductsPerCat <- renderPlotly({
     dat <- filtered() %>% group_by(product_category) %>% summarize(count = n_distinct(product_id))
     p <- ggplot(dat, aes(reorder(product_category, count), count,
                          text = paste0(product_category, ': ', count, ' products'))) +
-      geom_col(aes(fill = count)) + scale_fill_viridis() + coord_flip() + base_theme
+      geom_col(aes(fill = count)) + scale_fill_viridis(option = "cividis") + coord_flip() + base_theme
     ggplotly(p, tooltip = "text")
   })
   
-  # Type Detail
   output$plotTypeDetail <- renderPlotly({
-    dat <- filtered() %>% group_by(product_type) %>% summarize(revenue = sum(revenue))
+    dat <- filtered() %>% group_by(product_type) %>% summarize(revenue = sum(revenue, na.rm=TRUE))
     p <- ggplot(dat, aes(product_type, revenue,
                          text = paste0(product_type, ': $', scales::comma(revenue)))) +
-      geom_col(aes(fill = revenue)) + scale_fill_viridis() + coord_flip() + base_theme
+      geom_col(aes(fill = revenue)) + scale_fill_viridis(option = "inferno") + coord_flip() + base_theme
     ggplotly(p, tooltip = "text")
   })
   
-  # Brand Tab: Units & Unique Products
   output$plotTopBrandsquantity <- renderPlotly({
-    dat <- filtered() %>% group_by(product_brand) %>% summarize(quantity = sum(quantity)) %>% slice_max(quantity, n = 10)
+    dat <- filtered() %>% group_by(product_brand) %>% summarize(quantity = sum(quantity, na.rm=TRUE)) %>% slice_max(quantity, n = 10)
     p <- ggplot(dat, aes(reorder(product_brand, quantity), quantity,
                          text = paste0(product_brand, ': ', quantity, ' units'))) +
-      geom_col(aes(fill = quantity)) + scale_fill_viridis() + coord_flip() + base_theme
+      geom_col(aes(fill = quantity)) + scale_fill_viridis(option = "turbo") + coord_flip() + base_theme
     ggplotly(p, tooltip = "text")
   })
+  
   output$plotUniqueProdBrand <- renderPlotly({
     dat <- filtered() %>% group_by(product_brand) %>% summarize(unique_count = n_distinct(product_id)) %>% slice_max(unique_count, n = 10)
     p <- ggplot(dat, aes(reorder(product_brand, unique_count), unique_count,
                          text = paste0(product_brand, ': ', unique_count, ' products'))) +
-      geom_col(aes(fill = unique_count)) + scale_fill_viridis() + coord_flip() + base_theme
+      geom_col(aes(fill = unique_count)) + scale_fill_viridis(option = "viridis") + coord_flip() + base_theme
     ggplotly(p, tooltip = "text")
   })
   
-  # Data table
   output$tableData <- renderDT({
     datatable(filtered(), options = list(pageLength = 10, scrollX = TRUE))
   })
