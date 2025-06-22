@@ -92,7 +92,7 @@ ui <- dashboardPage(
   dashboardBody(
     fluidPage(
       tags$head(
-        tags$link(rel = "shortcut icon", href = "favicon.ico", type = "image/png"),
+        tags$link(rel = "shortcut icon", href = "favicon.ico", type = "image/x-icon"),
         tags$link(rel = "stylesheet", href = "https://fonts.googleapis.com/css?family=Roboto:400,700&display=swap")
       ),
       tabItems(
