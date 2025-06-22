@@ -25,7 +25,7 @@ db_connect <- function() {
 }
 
 # Dashboardthemes:
-# "grey_dark", "grey_light", "blue_gradient", "purple_gradient", "flat_red", dll.
+# "grey_dark", "grey_light", "blue_gradient", "purple_gradient", "flat_red"
 selected_theme <- "blue_gradient"
 
 # UI
@@ -41,11 +41,8 @@ ui <- dashboardPage(
     tags$head(
       tags$style(HTML(
         "
-        /* Responsive: sembunyikan selectInput/form-group saat sidebar collapse */
         body.sidebar-collapse .main-sidebar .form-group { display: none !important; }
-        /* Pastikan selectize full width saat sidebar expand */
         .main-sidebar .form-group .selectize-control { width: 100% !important; }
-        /* Styling sidebar & header untuk skin blue dengan gradient */
         .skin-blue .main-sidebar {
           background: linear-gradient(180deg, #4e79a7, #1f3b73);
         }
@@ -70,7 +67,6 @@ ui <- dashboardPage(
       )),
       tags$script(HTML(
         "
-        // JS: kirim status collapse ke Shiny jika mau custom logic di server
         $(document).on('click', '.sidebar-toggle', function() {
           var collapsed = $('body').hasClass('sidebar-collapse');
           Shiny.setInputValue('sidebar_collapsed', collapsed, {priority: 'event'});
@@ -228,5 +224,5 @@ server <- function(input, output, session) {
   })
 }
 
-# Jalankan aplikasi
+# Run app
 shinyApp(ui, server)
