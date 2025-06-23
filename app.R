@@ -191,7 +191,7 @@ server <- function(input, output, session) {
     dat <- filtered() %>% group_by(product_category) %>% summarize(count = n_distinct(product_id))
     p <- ggplot(dat, aes(reorder(product_category, count), count,
                          text = paste0(product_category, ': ', count, ' products'))) +
-      geom_col(aes(fill = count)) + scale_fill_viridis(option = "cividis") + coord_flip() + base_theme
+      geom_col(aes(fill = count)) + scale_fill_viridis(option = "viridis") + coord_flip() + base_theme
     ggplotly(p, tooltip = "text")
   })
   
@@ -199,7 +199,7 @@ server <- function(input, output, session) {
     dat <- filtered() %>% group_by(product_type) %>% summarize(revenue = sum(revenue, na.rm=TRUE))
     p <- ggplot(dat, aes(product_type, revenue,
                          text = paste0(product_type, ': $', scales::comma(revenue)))) +
-      geom_col(aes(fill = revenue)) + scale_fill_viridis(option = "plasma") + coord_flip() + base_theme
+      geom_col(aes(fill = revenue)) + scale_fill_viridis(option = "viridis") + coord_flip() + base_theme
     ggplotly(p, tooltip = "text")
   })
   
@@ -207,7 +207,7 @@ server <- function(input, output, session) {
     dat <- filtered() %>% group_by(product_brand) %>% summarize(quantity = sum(quantity, na.rm=TRUE)) %>% slice_max(quantity, n = 10)
     p <- ggplot(dat, aes(reorder(product_brand, quantity), quantity,
                          text = paste0(product_brand, ': ', quantity, ' units'))) +
-      geom_col(aes(fill = quantity)) + scale_fill_viridis(option = "turbo") + coord_flip() + base_theme
+      geom_col(aes(fill = quantity)) + scale_fill_viridis(option = "viridis") + coord_flip() + base_theme
     ggplotly(p, tooltip = "text")
   })
   
@@ -215,7 +215,7 @@ server <- function(input, output, session) {
     dat <- filtered() %>% group_by(product_brand) %>% summarize(unique_count = n_distinct(product_id)) %>% slice_max(unique_count, n = 10)
     p <- ggplot(dat, aes(reorder(product_brand, unique_count), unique_count,
                          text = paste0(product_brand, ': ', unique_count, ' products'))) +
-      geom_col(aes(fill = unique_count)) + scale_fill_viridis(option = "turbo") + coord_flip() + base_theme
+      geom_col(aes(fill = unique_count)) + scale_fill_viridis(option = "viridis") + coord_flip() + base_theme
     ggplotly(p, tooltip = "text")
   })
   
