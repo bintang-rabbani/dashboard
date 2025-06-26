@@ -175,7 +175,7 @@ server <- function(input, output, session) {
     dat <- filtered() %>% group_by(product_category) %>% summarize(average_price = sum(revenue, na.rm=TRUE)/sum(quantity, na.rm=TRUE))
     p <- ggplot(dat, aes(reorder(product_category, average_price), average_price,
                          text = paste0(product_category, ': $', round(average_price, 2)))) +
-      geom_col(aes(fill = average_price)) + scale_fill_viridis(option = "viridis") + coord_flip() + base_theme
+      geom_col(aes(fill = average_price)) + scale_fill_viridis(option = "rocket") + coord_flip() + base_theme
     ggplotly(p, tooltip = "text")
   })
   
@@ -183,7 +183,7 @@ server <- function(input, output, session) {
     dat <- filtered() %>% group_by(product_category) %>% summarize(quantity = sum(quantity, na.rm=TRUE))
     p <- ggplot(dat, aes(reorder(product_category, quantity), quantity,
                          text = paste0(product_category, ': ', quantity, ' units'))) +
-      geom_col(aes(fill = quantity)) + scale_fill_viridis(option = "viridis") + coord_flip() + base_theme
+      geom_col(aes(fill = quantity)) + scale_fill_viridis(option = "rocket") + coord_flip() + base_theme
     ggplotly(p, tooltip = "text")
   })
   
@@ -191,7 +191,7 @@ server <- function(input, output, session) {
     dat <- filtered() %>% group_by(product_category) %>% summarize(count = n_distinct(product_id))
     p <- ggplot(dat, aes(reorder(product_category, count), count,
                          text = paste0(product_category, ': ', count, ' products'))) +
-      geom_col(aes(fill = count)) + scale_fill_viridis(option = "viridis") + coord_flip() + base_theme
+      geom_col(aes(fill = count)) + scale_fill_viridis(option = "inferno") + coord_flip() + base_theme
     ggplotly(p, tooltip = "text")
   })
   
@@ -199,7 +199,7 @@ server <- function(input, output, session) {
     dat <- filtered() %>% group_by(product_type) %>% summarize(revenue = sum(revenue, na.rm=TRUE))
     p <- ggplot(dat, aes(product_type, revenue,
                          text = paste0(product_type, ': $', scales::comma(revenue)))) +
-      geom_col(aes(fill = revenue)) + scale_fill_viridis(option = "viridis") + coord_flip() + base_theme
+      geom_col(aes(fill = revenue)) + scale_fill_viridis(option = "mako") + coord_flip() + base_theme
     ggplotly(p, tooltip = "text")
   })
   
